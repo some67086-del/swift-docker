@@ -1,4 +1,5 @@
-FROM debian:12
+FROM ubuntu:24.04
+
 LABEL maintainer="Swift Infrastructure <swift-infrastructure@forums.swift.org>"
 LABEL description="Docker Container for the Swift programming language"
 
@@ -15,9 +16,9 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && ap
 #      52BB7E3DE28A71BE22EC05FFEF80A866B47A981F
 # uid           [ unknown] Swift 6.x Release Signing Key <swift-infrastructure@forums.swift.org>
 ARG SWIFT_SIGNING_KEY=52BB7E3DE28A71BE22EC05FFEF80A866B47A981F
-ARG SWIFT_PLATFORM=debian12
-ARG SWIFT_BRANCH=swift-6.2.4-release
-ARG SWIFT_VERSION=swift-6.2.4-RELEASE
+ARG SWIFT_PLATFORM=ubuntu24.04
+ARG SWIFT_BRANCH=swift-6.3-release
+ARG SWIFT_VERSION=swift-6.3-RELEASE
 ARG SWIFT_WEBROOT=https://download.swift.org
 
 ENV SWIFT_SIGNING_KEY=$SWIFT_SIGNING_KEY \
@@ -43,7 +44,7 @@ RUN set -e; \
     && SWIFT_SIG_URL="$SWIFT_BIN_URL.sig" \
     # - Grab curl and gpg here so we cache better up above
     && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -q update && apt-get -q install -y curl gpg && rm -rf /var/lib/apt/lists/* \
+    && apt-get -q update && apt-get -q install -y curl gnupg && rm -rf /var/lib/apt/lists/* \
     # - Download the GPG keys, Swift toolchain, and toolchain signature, and verify.
     && export GNUPGHOME="$(mktemp -d)" \
     && curl -fsSL "$SWIFT_BIN_URL" -o swift.tar.gz "$SWIFT_SIG_URL" -o swift.tar.gz.sig \
@@ -55,4 +56,4 @@ RUN set -e; \
         $SWIFT_VERSION-$SWIFT_PLATFORM$OS_ARCH_SUFFIX/usr/libexec/swift/linux \
     && chmod -R o+r /usr/lib/swift /usr/libexec/swift \
     && rm -rf "$GNUPGHOME" swift.tar.gz.sig swift.tar.gz \
-    && apt-get purge --auto-remove -y curl gpg
+    && apt-get purge --auto-remove -y curl gnupg

@@ -1,12 +1,24 @@
 FROM debian:12
+
 LABEL maintainer="Swift Infrastructure <swift-infrastructure@forums.swift.org>"
 LABEL description="Docker Container for the Swift programming language"
 
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && apt-get -q update && \
     apt-get -q install -y \
-    libcurl4 \
-    libxml2 \
+    binutils \
+    libicu-dev \
+    libcurl4-openssl-dev \
+    libedit-dev \
+    libsqlite3-dev \
+    libncurses-dev \
+    libpython3-dev \
+    libxml2-dev \
+    pkg-config \
+    uuid-dev \
     tzdata \
+    git \
+    gcc \
+    libstdc++-12-dev \
     && rm -r /var/lib/apt/lists/*
 
 # Everything up to here should cache nicely between Swift versions, assuming dev dependencies change little
@@ -16,8 +28,8 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && ap
 # uid           [ unknown] Swift 6.x Release Signing Key <swift-infrastructure@forums.swift.org>
 ARG SWIFT_SIGNING_KEY=52BB7E3DE28A71BE22EC05FFEF80A866B47A981F
 ARG SWIFT_PLATFORM=debian12
-ARG SWIFT_BRANCH=swift-6.2.4-release
-ARG SWIFT_VERSION=swift-6.2.4-RELEASE
+ARG SWIFT_BRANCH=swift-6.3-release
+ARG SWIFT_VERSION=swift-6.3-RELEASE
 ARG SWIFT_WEBROOT=https://download.swift.org
 
 ENV SWIFT_SIGNING_KEY=$SWIFT_SIGNING_KEY \
@@ -51,8 +63,9 @@ RUN set -e; \
     && gpg --batch --verify swift.tar.gz.sig swift.tar.gz \
     # - Unpack the toolchain, set libs permissions, and clean up.
     && tar -xzf swift.tar.gz --directory / --strip-components=1 \
-        $SWIFT_VERSION-$SWIFT_PLATFORM$OS_ARCH_SUFFIX/usr/lib/swift/linux \
-        $SWIFT_VERSION-$SWIFT_PLATFORM$OS_ARCH_SUFFIX/usr/libexec/swift/linux \
-    && chmod -R o+r /usr/lib/swift /usr/libexec/swift \
+    && chmod -R o+r /usr/lib/swift \
     && rm -rf "$GNUPGHOME" swift.tar.gz.sig swift.tar.gz \
     && apt-get purge --auto-remove -y curl gpg
+
+# Print Installed Swift Version
+RUN swift --version

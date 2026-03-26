@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/windows/servercore:1809 AS windows
+FROM mcr.microsoft.com/windows/servercore:ltsc2022 AS windows
 
 LABEL maintainer="Swift Infrastructure <swift-infrastructure@forums.swift.org>"
 LABEL description="Docker Container for the Swift programming language"
@@ -122,8 +122,8 @@ RUN Write-Host -NoNewLine ('Downloading {0} ... ' -f ${env:VSB});               
     Remove-Item -ErrorAction SilentlyContinue -Force -Recurse ${env:TEMP}\*
 
 # Install Swift toolchain.
-ARG SWIFT=https://download.swift.org/swift-6.2.4-release/windows10/swift-6.2.4-RELEASE/swift-6.2.4-RELEASE-windows10.exe
-ARG SWIFT_SHA256=222501D4A0EF6EC3B2F08B3E0055140BB3A5136527542239BB925F979689F4AD
+ARG SWIFT=https://download.swift.org/swift-6.3-release/windows10/swift-6.3-RELEASE/swift-6.3-RELEASE-windows10.exe
+ARG SWIFT_SHA256=A1370DF009DE920070AEF0C87D4FF80279515870DDBE6E8F035B2A5707444F13
 RUN Write-Host -NoNewLine ('Downloading {0} ... ' -f ${env:SWIFT});             \
     Invoke-WebRequest -Uri ${env:SWIFT} -OutFile installer.exe;                 \
     Write-Host '✓';                                                             \
